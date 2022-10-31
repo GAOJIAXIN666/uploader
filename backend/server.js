@@ -9,7 +9,7 @@ app.post("/upload", (req, res) => {
   setTimeout(() => {
     console.log("file uploaded");
     return res.status(200).json({ result: true, msg: "file uploaded" });
-  }, 3000);
+  }, 2000);
 });
 
 app.delete("/upload", (req, res) => {

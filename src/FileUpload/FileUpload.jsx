@@ -9,7 +9,6 @@ const FileUpload = ({ file, setFile, removeFile }) => {
     file = event.target.files[0];
     if (!file) return;
     file.isUploading = true;
-    setFile(file);
 
     // upload file
     const formData = new FormData();
@@ -23,7 +22,7 @@ const FileUpload = ({ file, setFile, removeFile }) => {
       .catch((err) => {
         // inform the user
         console.error(err);
-        removeFile();
+        //removeFile();
       });
   };
 
