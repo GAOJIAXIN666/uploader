@@ -14,12 +14,6 @@ li {
             margin-right: 0.8em;
         }
     }
-
-    p {
-        flex: 1;
-        font-size: 0.9rem;
-    }
-
     .actions {
         justify-self: flex-end;
         cursor: pointer;
@@ -29,3 +23,30 @@ li {
         }
     }
 }
+label {
+    text-align: left;
+    display: block;
+}
+
+ textarea {
+     width: 100%;
+     padding: 6px 10px;
+     margin: 6px 0;
+     border: 1px solid #ddd;
+     box-sizing: border-box;
+     display: block;
+ }
+ button {
+    width: 100%;
+    background: #f55321;
+    color: #fff;
+    border: 0;
+    margin: 6px 0;
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  form{
+    width: 100%;
+  }
