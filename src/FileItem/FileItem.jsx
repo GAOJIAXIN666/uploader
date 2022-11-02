@@ -8,27 +8,29 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import "./FileItem.scss";
 
-const FileItem = ({ file, removeFile }) => {
+const FileItem = ({ file, load, removeFile }) => {
+  console.log(load);
   const deleteFileHandler = (_name) => {
     axios
       .delete(`http://localhost:8080/upload?name=${_name}`)
       .then((res) => removeFile(_name))
       .catch((err) => console.error(err));
   };
+
   return (
     <li className="file-item" key={file.name}>
       <FontAwesomeIcon icon={faFileAlt} />
       <p>{file.name}</p>
       <div className="actions">
         <div className="loading"></div>
-        {file.isUploading && (
+        {load && (
           <FontAwesomeIcon
             icon={faSpinner}
             className="fa-spin"
             onClick={() => removeFile(file)}
           />
         )}
-        {!file.isUploading && (
+        {!load && (
           <FontAwesomeIcon icon={faTrash} onClick={() => removeFile(file)} />
         )}
       </div>
