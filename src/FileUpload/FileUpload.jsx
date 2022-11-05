@@ -14,9 +14,12 @@ const FileUpload = ({ queryStr, file, setFile, removeFile, setLoad }) => {
     formData.append("newFile", file, file.name);
 
     console.log("三个输入款的查询条件", queryStr);
-
     axios
-      .post("http://localhost:8080/upload", formData)
+      .post("http://localhost:8080/upload", formData, {
+        headers: {
+          "content-type": "multipart/form-data",
+        },
+      })
       .then((res) => {
         setLoad(false);
       })

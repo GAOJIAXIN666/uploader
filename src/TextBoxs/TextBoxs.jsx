@@ -4,11 +4,12 @@ import "./TextBoxs.scss";
 const TextBoxs = ({ onChange }) => {
   const [table, setTableName] = useState("");
   const [column, setColumnName] = useState("");
+  const [foreignKey, setForeignKey] = useState("");
   const [query, setqueryName] = useState("");
 
   useEffect(() => {
-    onChange && onChange({ table, column, query });
-  }, [table, column, query]);
+    onChange && onChange({ table, column, foreignKey, query });
+  }, [table, column, foreignKey, query]);
 
   return (
     <li className="textBoxs">
@@ -22,6 +23,11 @@ const TextBoxs = ({ onChange }) => {
         <textarea
           required
           onChange={(e) => setColumnName(e.target.value)}
+        ></textarea>
+        <label>Foreign Key:</label>
+        <textarea
+          required
+          onChange={(e) => setForeignKey(e.target.value)}
         ></textarea>
         <label>SQL query you want to perform:</label>
         <textarea
