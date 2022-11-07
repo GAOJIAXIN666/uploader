@@ -7,7 +7,6 @@ import TextBoxs from "./TextBoxs/TextBoxs";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
-import Home from "./Views/Home";
 import About from "./Views/About";
 import Documentation from "./Views/Documentation";
 
@@ -32,7 +31,7 @@ function App() {
           <Switch>
             <Route exact path="/">
               <div className="title">SQL file</div>
-              <TextBoxs onChange={handleChange} />
+              <TextBoxs onChange={handleChange} queryStr={queryStr} />
               <FileUpload
                 file={file}
                 setFile={setFile}

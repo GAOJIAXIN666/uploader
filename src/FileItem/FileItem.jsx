@@ -9,7 +9,6 @@ import {
 import "./FileItem.scss";
 
 const FileItem = ({ file, load, removeFile }) => {
-  console.log(load);
   const deleteFileHandler = (_name) => {
     axios
       .delete(`http://localhost:8080/upload?name=${_name}`)

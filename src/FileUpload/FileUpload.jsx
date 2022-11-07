@@ -4,7 +4,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import "./FileUpload.scss";
 import axios from "axios";
 
-const FileUpload = ({ queryStr, file, setFile, removeFile, setLoad }) => {
+const FileUpload = ({ file, setFile, setLoad }) => {
   const uploadHandler = (event) => {
     file = event.target.files[0];
     if (!file) return;
@@ -12,8 +12,6 @@ const FileUpload = ({ queryStr, file, setFile, removeFile, setLoad }) => {
     // upload file
     const formData = new FormData();
     formData.append("newFile", file, file.name);
-
-    console.log("三个输入款的查询条件", queryStr);
     axios
       .post("http://localhost:8080/upload", formData, {
         headers: {
