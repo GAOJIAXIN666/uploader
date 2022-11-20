@@ -2,16 +2,21 @@ import { useEffect, useState } from "react";
 import "./TextBoxs.scss";
 import axios from "axios";
 
-const TextBoxs = ({ onChange, queryStr }) => {
+const TextBoxs = ({ onChange }) => {
   const [table, setTableName] = useState("");
   const [column, setColumnName] = useState("");
   const [foreignKey, setForeignKey] = useState("");
   const [query, setqueryName] = useState("");
 
+  const queryStr = new FormData();
+  queryStr.append("table", table);
+  queryStr.append("column", column);
+  queryStr.append("foreignKey", foreignKey);
+  queryStr.append("query", query);
+
   const sendStringsHandler = () => {
-    console.log("四个输入款的查询条件", queryStr);
     axios
-      .post("http://localhost:8080/sendqueries", queryStr)
+      .post("http://localhost:8000/sendqueries", queryStr)
       .then((res) => {})
       .catch((err) => {
         console.error(err);
@@ -25,22 +30,22 @@ const TextBoxs = ({ onChange, queryStr }) => {
   return (
     <li className="textBoxs">
       <form>
-        <label>Table Name:</label>
+        <label>Table Name: (e.g. users)</label>
         <textarea
           required
           onChange={(e) => setTableName(e.target.value)}
         ></textarea>
-        <label>Column Name:</label>
+        <label>Column Name: (e.g. user_id)</label>
         <textarea
           required
           onChange={(e) => setColumnName(e.target.value)}
         ></textarea>
-        <label>Foreign Key:</label>
+        <label>Foreign Key: (Please be careful about spaces: e.g. left_table_attribute:right_table_name,right_table_attribute; )</label>
         <textarea
           required
           onChange={(e) => setForeignKey(e.target.value)}
         ></textarea>
-        <label>SQL query you want to perform:</label>
+        <label>SQL query you want to perform: (e.g. SELECT user_id from users)</label>
         <textarea
           required
           onChange={(e) => setqueryName(e.target.value)}

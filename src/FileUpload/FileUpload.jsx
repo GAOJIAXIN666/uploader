@@ -4,6 +4,13 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import "./FileUpload.scss";
 import axios from "axios";
 
+// export class ImputationRes {
+//   final_error;
+//   address;
+//   ImputationRes(){} 
+// };
+
+
 const FileUpload = ({ file, setFile, setLoad }) => {
   const uploadHandler = (event) => {
     file = event.target.files[0];
@@ -12,12 +19,13 @@ const FileUpload = ({ file, setFile, setLoad }) => {
     // upload file
     const formData = new FormData();
     formData.append("newFile", file, file.name);
+
+    const config = {     
+      headers: { 'content-type': 'multipart/form-data' }
+    }
+
     axios
-      .post("http://localhost:8080/upload", formData, {
-        headers: {
-          "content-type": "multipart/form-data",
-        },
-      })
+      .post("http://localhost:8000/upload", formData, config)
       .then((res) => {
         setLoad(false);
       })

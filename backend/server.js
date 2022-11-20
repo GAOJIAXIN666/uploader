@@ -39,6 +39,6 @@ app.delete("/upload", (req, res) => {
   return res.status(200).json({ result: true, msg: "file deleted" });
 });
 
-app.listen(8080, () => {
-  console.log(`Server running on 8080`);
+app.listen(8000, () => {
+  console.log(`Server running on 8000`);
 });
