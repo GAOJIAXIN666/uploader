@@ -88,13 +88,12 @@ async def impute(newFile: UploadFile = File()):
 
             try:
                 start_time = time.time()
-                # final_error, processed_data = imputation.impute_missing_values(sql_path, app.table_to_impute, app.column_to_impute, app.input_query, app.foreign_keys)  
-                print("Error not in imputation")
+                processed_data, eval_metric = imputation.impute_missing_values(sql_path, app.table_to_impute, app.column_to_impute, app.input_query, app.foreign_keys)  
                 end_time = time.time()    
-                print("Time for imputation: %.4f s", end_time - start_time)
-                final_error = 0.1
-                processed_data = pd.DataFrame(data = {'col1': [1, 2], 'col2': [3, 4]})
-                fname = "accuracy_%.2f.csv" % (1 - final_error)
+                print("Time for imputation: %.4f s" % (end_time - start_time))
+                #final_error = 0.1
+                #processed_data = pd.DataFrame(data = {'col1': [1, 2], 'col2': [3, 4]})
+                fname = "%s.csv" % (eval_metric)
 
                 file_path = os.path.join("persistant_folder", fname)
                 processed_data.to_csv(file_path, index=False)
@@ -106,5 +105,4 @@ async def impute(newFile: UploadFile = File()):
                     status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
                 )   
                         
-    return {"error"}
 

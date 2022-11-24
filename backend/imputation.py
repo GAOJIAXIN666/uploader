@@ -9,6 +9,8 @@ from sklearn import neighbors
 from sklearn.metrics import mean_squared_error 
 from math import sqrt
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
 
 def getTableSchema(conn, table_name):
@@ -121,16 +123,18 @@ def imputation(whole_data, column_to_impute, key_ls):
     print(f"Input columns: {list(whole_data.columns)}")
     col = whole_data[column_to_impute]
     n = len(whole_data)
-    print("Unique value percentage: %.4f: " % (len(col.unique()) / n))
-    if col.dtype.kind not in 'iufc' and len(col.unique()) / n >= 0.2: 
+    print("Unique value percentage: %.4f " % (len(col.unique()) / n))
+    if col.dtype.kind not in 'iufc' and (n - len(col.unique())) / n < 0.9: 
         return -1, None  # cannot impute
+    if col.dtype.kind not in 'iufc':
+        whole_data[column_to_impute] = pd.Categorical(col)
+    col = whole_data[column_to_impute]
     cols = []
     for i in whole_data.columns:
-        if i in key_ls:
-            if i == column_to_impute:
-                cols.append(i)
-            else:
-                continue
+        if i == column_to_impute:
+            cols.append(i)
+        elif i in key_ls:
+            continue
         elif whole_data[i].dtype.kind in 'iufc' or whole_data[i].dtype.name == 'category':
             cols.append(i)
         elif (n - len(whole_data[i].unique())) / n >= 0.9:
@@ -140,9 +144,10 @@ def imputation(whole_data, column_to_impute, key_ls):
     df = dat.dropna()
     if len(df) > 10000:
         df = df.sample(n=10000)
-    df = pd.get_dummies(df)
+    new_df = pd.get_dummies(df.drop(column_to_impute,axis=1))
+    new_df[column_to_impute] = df[column_to_impute]
 
-    train , test = train_test_split(df, test_size = 0.3)
+    train , test = train_test_split(new_df, test_size = 0.3)
     x_train = train.drop(column_to_impute, axis=1)
     y_train = train[column_to_impute]
     x_test = test.drop(column_to_impute, axis=1)
@@ -152,40 +157,68 @@ def imputation(whole_data, column_to_impute, key_ls):
     x_train = pd.DataFrame(x_train_scaled)
     x_test_scaled = scaler.fit_transform(x_test)
     x_test = pd.DataFrame(x_test_scaled)
-
-    model_knn, error_knn = KNN(x_train,y_train,x_test,y_test)
-    model_rf, error_rf = RandomForest(x_train, y_train, x_test, y_test)
-    model= None
-    need_scale = False
-    final_error = error_rf
-    if error_knn < error_rf:
-        model = model_knn
-        final_error = error_knn
+    string = ""
+    model = None
+    if col.dtype.name == 'category':
+        string += "Accuracy_"
+        model_knn, acc_knn = KNN_classification(x_train,y_train,x_test,y_test)
+        model_rf, acc_rf = RandomForest_classification(x_train, y_train, x_test, y_test)
+        if acc_knn > acc_rf:
+            model = model_knn
+            string += str(round(acc_knn,2))
+        else:
+            model = model_rf
+            string += str(round(acc_rf,2))
+            
     else:
-        model = model_rf
-        need_scale = True
-    X = dat.drop(column_to_impute,axis=1)
-    if need_scale:
-        X = scaler.fit_transform(X)
-    for i in range(len(dat)):
-        if np.isnan(dat.loc[i,column_to_impute]):
-            whole_data.loc[i,column_to_impute] = model.predict(X[i,:])
+        string += "RMSE_"
+        model_knn, error_knn = KNN_regression(x_train,y_train,x_test,y_test)
+        model_rf, error_rf = RandomForest_regression(x_train, y_train, x_test, y_test)
+        if error_knn < error_rf:
+            model = model_knn
+            string += str(round(error_knn,2))
+        else:
+            model = model_rf
+            string += str(round(error_rf,2))
+    X = pd.get_dummies(dat.drop(column_to_impute,axis=1))
+    X = scaler.fit_transform(X)
+    if col.dtype.name == 'category':
+        for i in range(len(dat)):
+            if dat.loc[i,column_to_impute]:
+                whole_data.loc[i,column_to_impute] = model.predict(X[i,:].reshape(1,-1))
+    else:
+        for i in range(len(dat)):
+            if np.isnan(dat.loc[i,column_to_impute]):
+                whole_data.loc[i,column_to_impute] = model.predict(X[i,:].reshape(1,-1))
     
-    return final_error, whole_data
+    return whole_data, string
     
-def KNN(x_train,y_train,x_test,y_test):      
-    model = neighbors.KNeighborsRegressor(k=sqrt(len(x_train)))
+def KNN_classification(x_train,y_train,x_test,y_test):      
+    model = neighbors.KNeighborsClassifier(n_neighbors=int(sqrt(len(x_train))))
+    model.fit(x_train,y_train)
+    pred = model.predict(x_test)
+    acc = sum(y_test==pred) / len(pred)
+    return model, acc
+
+def KNN_regression(x_train,y_train,x_test,y_test):
+    model = neighbors.KNeighborsRegressor(n_neighbors=int(sqrt(len(x_train))))
     model.fit(x_train,y_train)
     pred = model.predict(x_test)
     error = sqrt(mean_squared_error(y_test,pred))
     return model, error
-    
-def RandomForest(x_train,y_train,x_test,y_test):
+
+def RandomForest_classification(x_train,y_train,x_test,y_test):
     model = RandomForestClassifier()
     model.fit(x_train,y_train)
     pred = model.predict(x_test)
+    acc = sum(y_test==pred) / len(pred)
+    return model, acc
+def RandomForest_regression(x_train,y_train,x_test,y_test):
+    model = RandomForestRegressor()
+    model.fit(x_train,y_train)
+    pred = model.predict(x_test)
     error = sqrt(mean_squared_error(y_test,pred))
-    return model, error    
+    return model, error
 
 
 #cur.execute("PRAGMA table_info('Users')").fetchall()
