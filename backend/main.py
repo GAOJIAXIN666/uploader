@@ -98,7 +98,7 @@ async def impute(newFile: UploadFile = File()):
                 file_path = os.path.join("persistant_folder", fname)
                 processed_data.to_csv(file_path, index=False)
               
-                return FileResponse(file_path, media_type="text/csv")        
+                return FileResponse(file_path, filename = fname)       
             except:
                 traceback.print_exc()
                 raise HTTPException(

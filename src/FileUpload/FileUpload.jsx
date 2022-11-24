@@ -7,9 +7,8 @@ import axios from "axios";
 // export class ImputationRes {
 //   final_error;
 //   address;
-//   ImputationRes(){} 
+//   ImputationRes(){}
 // };
-
 
 const FileUpload = ({ file, setFile, setLoad }) => {
   const uploadHandler = (event) => {
@@ -20,9 +19,9 @@ const FileUpload = ({ file, setFile, setLoad }) => {
     const formData = new FormData();
     formData.append("newFile", file, file.name);
 
-    const config = {     
-      headers: { 'content-type': 'multipart/form-data' }
-    }
+    const config = {
+      headers: { "content-type": "multipart/form-data" },
+    };
 
     axios
       .post("http://localhost:8000/upload", formData, config)
@@ -31,7 +30,7 @@ const FileUpload = ({ file, setFile, setLoad }) => {
       })
       .catch((err) => {
         // inform the user
-        console.error(err);
+        alert("Process failed, Please Retry");
         //removeFile();
       });
   };
